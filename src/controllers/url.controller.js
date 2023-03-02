@@ -27,3 +27,27 @@ export async function postURL(req,res){
 
 
 }
+
+export async function getURL(req,res){
+  const id = req.params.id;
+
+  try{
+    //check if url exists
+    const queryResult = await db.query(
+      `SELECT id, "shortUrl", url FROM urls WHERE id = $1`,
+      [id]
+    );
+
+    const urlData = queryResult.rows[0];
+
+    if(!urlData){
+      return res.status(404).send("URL not found");
+    }
+
+    res.status(200).send(urlData);
+    
+  }catch(err){
+    return res.status(500).send("Erro no getURL" + err.message);
+  }
+
+}
