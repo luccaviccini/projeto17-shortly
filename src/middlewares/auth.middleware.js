@@ -1,11 +1,11 @@
 import { db } from "../database/database.connection.js";
 
 export async function authValidation(req, res, next) {
-  const { authorization } = req.headers;
-  if (!authorization) {
+  const auth = req.headers.authorization;
+  if (!auth) {
     return res.status(401).send("No token provided");
   }
-  const token = authorization.replace("Bearer ", "");
+  const token = auth.replace("Bearer ", "");
 
   try {
     const sessionQuery = await db.query(
@@ -17,17 +17,9 @@ export async function authValidation(req, res, next) {
       return res.status(401).send("Invalid token");
     }
 
-    const userQuery = await db.query(`SELECT * FROM users WHERE id = $1`, [
-      session.userId,
-    ]);
-
-    const user = userQuery.rows[0];
-    if (!user) {
-      return res.status(401).send("No user found");
-    }
-
-    res.locals.user = user;
+    res.locals.session = session;     
     next();
+    
   } catch (err) {
     return res.status(500).send(err.message);
   }

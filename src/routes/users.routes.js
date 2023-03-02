@@ -4,7 +4,7 @@ import { signUpSchema } from "../schemas/user.schema.js";
 import { signInSchema } from "../schemas/signIn.schema.js";
 import { userSignUp, userSignIn } from "../controllers/users.controller.js";
 import { authValidation } from "../middlewares/auth.middleware.js";
-import { userExists } from "../middlewares/userExists.middleware.js";
+import { userExists } from "../middlewares/users.middleware.js";
 
 const router = Router();
 
