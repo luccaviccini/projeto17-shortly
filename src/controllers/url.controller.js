@@ -79,13 +79,14 @@ export async function deleteURL(req, res) {
 
   try {
     const queryResult = await db.query(
-      `SELECT * FROM urls WHERE id = $1 AND "userId" = $2`,
-      [id2delete, userId]
+      `SELECT * FROM urls WHERE id = $1`,
+      [id2delete]
     );
 
     const urlData = queryResult.rows[0];
 
     if (!urlData) return res.status(404).send("URL not found");
+    
     if (urlData.userId !== userId) return res.status(401).send("Unauthorized");
 
     await db.query(`DELETE FROM urls WHERE id = $1`, [id2delete]);
