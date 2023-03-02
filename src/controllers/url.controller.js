@@ -1,13 +1,13 @@
 import { db } from "../database/database.connection.js";
-import {nanoid} from "nanoid";
+import { nanoid } from "nanoid";
 
-export async function postURL(req,res){
-  const {url} = req.body;
-  const {userId} = res.locals.session;
+export async function postURL(req, res) {
+  const { url } = req.body;
+  const { userId } = res.locals.session;
 
   const shortURL = nanoid(10);
 
-  try{
+  try {
     await db.query(
       `INSERT INTO urls ("userId", url, "shortUrl") VALUES ($1, $2, $3)`,
       [userId, url, shortURL]
@@ -20,18 +20,15 @@ export async function postURL(req,res){
 
     const shortUrlData = queryResult.rows[0];
     return res.status(201).send(shortUrlData);
-  }
-  catch(err){
+  } catch (err) {
     return res.status(500).send(err.message);
   }
-
-
 }
 
-export async function getURL(req,res){
+export async function getURL(req, res) {
   const id = req.params.id;
 
-  try{
+  try {
     //check if url exists
     const queryResult = await db.query(
       `SELECT id, "shortUrl", url FROM urls WHERE id = $1`,
@@ -40,16 +37,14 @@ export async function getURL(req,res){
 
     const urlData = queryResult.rows[0];
 
-    if(!urlData){
+    if (!urlData) {
       return res.status(404).send("URL not found");
     }
 
     res.status(200).send(urlData);
-    
-  }catch(err){
+  } catch (err) {
     return res.status(500).send("Erro no getURL" + err.message);
   }
-
 }
 
 export async function getShortURL(req, res) {
@@ -74,6 +69,30 @@ export async function getShortURL(req, res) {
     return res.redirect(url);
   } catch (error) {
     console.error(`Error in getShortURL: ${error.message}`);
+    return res.status(500).send("Internal Server Error");
+  }
+}
+
+export async function deleteURL(req, res) {
+  const { userId } = res.locals.session;
+  const id2delete = req.params.id;
+
+  try {
+    const queryResult = await db.query(
+      `SELECT * FROM urls WHERE id = $1 AND "userId" = $2`,
+      [id2delete, userId]
+    );
+
+    const urlData = queryResult.rows[0];
+
+    if (!urlData) return res.status(404).send("URL not found");
+    if (urlData.userId !== userId) return res.status(401).send("Unauthorized");
+
+    await db.query(`DELETE FROM urls WHERE id = $1`, [id2delete]);
+
+    return res.sendStatus(204);
+  } catch (err) {
+    console.error(`Error in deleteURL: ${err.message}`);
     return res.status(500).send("Internal Server Error");
   }
 }
