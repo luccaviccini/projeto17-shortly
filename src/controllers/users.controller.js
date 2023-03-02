@@ -42,13 +42,21 @@ export async function userSignIn(req, res) {
 
     // compare passwords
     if (bcrypt.compareSync(password, user.password)) {
+      
       const token = uuid();
       await db.query(`INSERT INTO sessions (token, "userId") VALUES ($1, $2)`, [
         token,
         user.id,
       ]);
+
+      res.locals.session = {
+        userId: user.id,
+        token
+      };
       return res.send(token);
     }
+
+    
 
     res.sendStatus(401);
   } catch (err) {
