@@ -51,3 +51,34 @@ export async function getURL(req,res){
   }
 
 }
+
+export async function getShortURL(req,res){
+  const shortUrl = req.params.shortUrl;
+
+  try{
+    //check if url exists
+    const queryResult = await db.query(
+      ` SELECT url FROM urls
+        WHERE "shortUrl" = $1
+      `,
+      [shortUrl]
+    );
+
+    const urlData = queryResult.rows[0];
+    if(!urlData){
+      return res.status(404).send("URL not found");
+    }
+    // updating visitCount
+    await db.query(
+      `UPDATE urls SET "visitCount" = "visitCount" + 1 WHERE "shortUrl" = $1`,
+      [shortUrl]
+    );
+
+    res.redirect(urlData.url);
+
+    
+  }catch(err){
+    return res.status(500).send("Erro no getShortURL" + err.message);
+  }
+
+}
