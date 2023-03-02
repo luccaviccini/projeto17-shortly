@@ -26,9 +26,9 @@ SET default_table_access_method = heap;
 
 CREATE TABLE public.sessions (
     id integer NOT NULL,
-    token text NOT NULL,
     "userId" integer NOT NULL,
-    active boolean DEFAULT true NOT NULL
+    token text NOT NULL,
+    "createdAt" timestamp without time zone DEFAULT now() NOT NULL
 );
 
 
@@ -61,8 +61,8 @@ CREATE TABLE public.urls (
     url text NOT NULL,
     "shortUrl" text NOT NULL,
     "userId" integer NOT NULL,
-    views integer DEFAULT 0 NOT NULL,
-    "createdAt" timestamp without time zone DEFAULT now() NOT NULL
+    "createdAt" timestamp without time zone DEFAULT now() NOT NULL,
+    "visitCount" integer DEFAULT 0 NOT NULL
 );
 
 
@@ -144,42 +144,39 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 -- Data for Name: sessions; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.sessions VALUES (1, '823513be-28d9-4011-b166-764e54b108f4', 1, true);
 
 
 --
 -- Data for Name: urls; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.urls VALUES (2, 'https://ovicio.com.br/wp-content/uploads/2023/02/20230217-fpkvdoywcaitdj0.jpg', 'zNJ2byZj', 1, 1, '2023-03-01 12:34:20.838026');
 
 
 --
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.users VALUES (1, 'João', 'joao@driven.com.br', '$2b$10$eju7bgTD0lDqxRCSQUE6H.fIkB0qKdXT.xjd/6kuF3ztqGx5Lnbmi', '2023-03-01 12:26:16.826764');
 
 
 --
 -- Name: sessions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.sessions_id_seq', 1, true);
+SELECT pg_catalog.setval('public.sessions_id_seq', 1, false);
 
 
 --
 -- Name: urls_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.urls_id_seq', 2, true);
+SELECT pg_catalog.setval('public.urls_id_seq', 1, false);
 
 
 --
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 1, true);
+SELECT pg_catalog.setval('public.users_id_seq', 1, false);
 
 
 --
