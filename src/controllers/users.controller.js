@@ -5,7 +5,9 @@ import { v4 as uuid } from "uuid";
 
 
 export async function userSignUp(req, res) {
-  const {name, email, password} = res.locals.userSignUp;
+  const { name, email, password } = req.body;
+
+  const hashedPassword = bcrypt.hashSync(password, 10);   
 
   try {  
 
@@ -14,7 +16,7 @@ export async function userSignUp(req, res) {
       ` INSERT INTO users 
                     (name, email, password)
                     VALUES ($1, $2, $3)`,
-      [name, email, password]
+      [name, email, hashedPassword]
     );
     
     res.status(201).send("User created in database with success.");
@@ -54,33 +56,3 @@ export async function userSignIn(req, res) {
   }
 }
 
-export async function getUserById(req, res) {
-  const {user} = res.locals;
-
-  try{
-    const visitsQuery = await db.query(
-      `SELECT SUM(s."views") FROM urls s WHERE s."userId" = $1`,
-      [user.id]
-    );
-    const numberOfVisits = visitsQuery.rows[0];
-
-    const urlsQuery = await db.query(
-      `SELECT * FROM urls s WHERE s."userId" = $1`,
-      [user.id]
-    );
-
-    const urls = urlsQuery.rows;
-
-    res.send({
-      id: user.id,
-      name: user.name,
-      visitCount: numberOfVisits.sum || 0,
-      shortenedUrls: urls
-      
-    })
-
-  }catch(err){
-    return res.status(500).send(err.message);
-  }
-  
-}
