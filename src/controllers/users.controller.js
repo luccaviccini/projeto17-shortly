@@ -53,7 +53,7 @@ export async function userSignIn(req, res) {
         userId: user.id,
         token
       };
-      return res.send(token);
+      return res.status(200).send({ token });
     }
 
     
