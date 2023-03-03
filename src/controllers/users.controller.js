@@ -83,3 +83,26 @@ export async function getUsers(req, res) {
     return res.status(500).send("Erro no getUsers" + err.message);
   }
 }
+
+export async function getRanking(req, res){
+  try{
+    const queryResult = await db.query(
+      `
+      SELECT u.id, u.name, COALESCE(links_count, 0) AS linksCount, COALESCE(visit_count, 0) AS visitCount
+      FROM users u
+      LEFT JOIN (
+      SELECT userId, COUNT(*) AS links_count, SUM(visitCount) AS visit_count
+      FROM urls
+      GROUP BY userId) AS uc ON u.id = uc.userId
+      ORDER BY visitCount DESC NULLS LAST, linksCount DESC NULLS LAST, u.id ASC
+      LIMIT 10;`
+    )
+
+    const rankingData = queryResult.rows;   
+
+    res.status(200).send(rankingData);
+  }
+  catch(err){
+    return res.status(500).send("Erro no getRanking" + err.message);
+  }
+}
