@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 dotenv.config();
-import routes from "./src/routes/main.routes.js";
+import routes from "./routes/main.routes.js";
 
 const app = express();
 app.use(express.json()); // to receive req in body
