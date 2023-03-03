@@ -88,15 +88,20 @@ export async function getRanking(req, res){
   try{
     const queryResult = await db.query(
       `
-      SELECT u.id, u.name, COALESCE(links_count, 0) AS linksCount, COALESCE(visit_count, 0) AS visitCount
-      FROM users u
-      LEFT JOIN (
-      SELECT userId, COUNT(*) AS links_count, SUM(visitCount) AS visit_count
-      FROM urls
-      GROUP BY userId) AS uc ON u.id = uc.userId
-      ORDER BY visitCount DESC NULLS LAST, linksCount DESC NULLS LAST, u.id ASC
-      LIMIT 10;`
-    )
+      SELECT users.id, users.name,
+         COALESCE(links_count, 0) AS "linksCount",
+          COALESCE(visit_count, 0) AS "visitCount"
+          FROM users
+              LEFT JOIN (
+                SELECT "userId", COUNT(*) AS links_count,
+                SUM("visitCount") AS visit_count
+                FROM urls
+                  GROUP BY "userId"
+              )
+              AS url_counts ON users.id = url_counts."userId"
+    ORDER BY visit_count DESC NULLS LAST, links_count DESC NULLS LAST, users.id ASC
+    LIMIT 10;`
+    );
 
     const rankingData = queryResult.rows;   
 
